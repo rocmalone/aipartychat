@@ -150,6 +150,21 @@ app.post("/api/reactroll", async (req, res) => {
     const resMessage = await chatWithAi(newMessages);
     console.log("res message: ", resMessage);
     res.status(200).send(resMessage);
+  } else if (reactTo === "ai") {
+    newMessage = {
+      className: "leader",
+      text:
+        "You are playing a game of dice called deathroll with " +
+        name +
+        " and you just rolled " +
+        currentRoll +
+        ". Say your reaction to your own roll without quotations.",
+      owner: "system",
+    };
+    const newMessages = [...messages, newMessage];
+    const resMessage = await chatWithAi(newMessages);
+    console.log("res message: ", resMessage);
+    res.status(200).send(resMessage);
   }
 
   const resMessage = {

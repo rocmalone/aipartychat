@@ -115,11 +115,10 @@ function App() {
             aiIgnore: "true",
           });
           const callRollValue = res.data.rollValue;
-          setCurrentRoll(callRollValue);
           setMessages([...messages, res.data]);
           // Insert check for === 1 rollValue and human loss here
 
-          const reactionThreshold = 0.01;
+          const reactionThreshold = 0.5;
           const reactionRand = Math.random();
 
           // If player is trying to cheat by rolling higher
@@ -136,10 +135,11 @@ function App() {
             });
             setMessages([...messages, cheatRes.data]);
           } else {
+            setCurrentRoll(callRollValue);
+
             let reactionData;
             // If a reaction is triggered
-            if (reactionRand > reactionThreshold) {
-              // TODO: implement reactions
+            if (reactionRand >= reactionThreshold) {
               const reactionRes = await axios.post(apiUrl + "reactroll", {
                 name: userName,
                 opponent: opponent,
@@ -174,11 +174,24 @@ function App() {
             const resRollValue = res2.data.rollValue;
             setCurrentRoll(resRollValue);
 
-            const selfReactionThreshold = 0.01;
+            const selfReactionThreshold = 0.5;
             const selfReactionRand = Math.random();
             // Insert check for === 1 rollValue and AI loss here
             // else if reaction triggered
             if (selfReactionRand > selfReactionThreshold) {
+              const reactionRes = await axios.post(apiUrl + "reactroll", {
+                name: userName,
+                opponent: opponent,
+                messages: messages,
+                min: min,
+                max: max,
+                currentRoll: resRollValue,
+                owner: "human",
+                aiIgnore: "true",
+                reactTo: "ai",
+              });
+              setMessages([...messages, reactionRes.data]);
+              reactionData = reactionRes.data;
             }
           }
         })();
