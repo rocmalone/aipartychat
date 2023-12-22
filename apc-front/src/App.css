@@ -17,14 +17,24 @@ body {
 .chatWrapper {
   --member-color: #aaa7ff;
   --leader-color: #76c5ff;
+  --server-color: #f2ef75;
   font-family: "Arial Narrow", Arial, sans-serif;
   font-size: 16pt;
   color: var(--member-color);
+  max-width: 589px;
 }
 
 .chat {
   padding-left: 16px;
   padding-bottom: 4px;
+
+  border: 1px solid red;
+  height: 300px;
+  overflow: auto;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .chat .member {
@@ -33,6 +43,10 @@ body {
 
 .chat .leader {
   color: var(--leader-color);
+}
+
+.chat .roll {
+  color: var(--server-color);
 }
 
 .chatbar {
@@ -52,15 +66,18 @@ body {
   position: absolute;
   top: 15px;
   left: 19px;
+  width: 90%;
 }
 
 .chatbarInput {
   border: none;
+  /* border: 1px solid red; */
   background: none;
   padding: 0;
   margin: 0;
   outline: none;
 
+  width: 90%;
   font-family: "Arial Narrow";
   font-size: 16pt;
   color: var(--member-color);
