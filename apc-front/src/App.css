@@ -13,6 +13,18 @@ body {
   border: 1px solid red;
 }
 
+.nameSelectWrapper {
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 16pt;
+  color: white;
+}
+
+.nameInput {
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 16pt;
+  color: black;
+}
+
 /* Chatbox */
 .chatWrapper {
   --member-color: #aaa7ff;
@@ -22,19 +34,26 @@ body {
   font-size: 16pt;
   color: var(--member-color);
   max-width: 589px;
+  border: 1px solid red;
 }
 
 .chat {
   padding-left: 16px;
   padding-bottom: 4px;
 
-  border: 1px solid red;
-  height: 300px;
-  overflow: auto;
+  /* border: 1px solid red; */
+  max-height: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  /* justify-content: flex-end; */
+}
+
+.chat div {
+  flex-basis: 0;
+  flex-grow: 1;
 }
 
 .chat .member {
@@ -47,6 +66,11 @@ body {
 
 .chat .roll {
   color: var(--server-color);
+}
+
+.chat {
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 .chatbar {

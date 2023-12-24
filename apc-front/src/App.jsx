@@ -15,6 +15,7 @@ function App() {
   const [userName, setUserName] = useState("Dantes");
   const [opponent, setOpponent] = useState("Bacchus");
   const [currentRoll, setCurrentRoll] = useState(100);
+  const [gameOver, setGameOver] = useState(0);
 
   const [userRoll, setUserRoll] = useState(null);
 
@@ -25,9 +26,17 @@ function App() {
 
   const [messages, setMessages] = useState([
     {
-      name: "Bacchus",
-      text: '"Thanks for accepting inv"',
-      className: "leader",
+      name: name,
+      className: "roll",
+      text: "[System] Type /roll to start playing death roll, or ask Bacchus how to play.",
+      aiIgnore: "true",
+      owner: "system",
+    },
+    {
+      name: name,
+      className: "roll",
+      text: "Bacchus joins the party.",
+      aiIgnore: "true",
       owner: "ai",
     },
     // {
@@ -118,11 +127,31 @@ function App() {
           setMessages([...messages, res.data]);
           // Insert check for === 1 rollValue and human loss here
 
-          const reactionThreshold = 0.5;
+          const reactionThreshold = 1.1;
           const reactionRand = Math.random();
 
+          if (callRollValue === 1) {
+            const loseRes = await axios.post(apiUrl + "lose", {
+              name: userName,
+              opponent: opponent,
+              messages: messages,
+              min: min,
+              max: max,
+              owner: "human",
+              aiIgnore: "true",
+            });
+            const leavesThePartyMessage = {
+              name: opponent,
+              text: opponent + " leaves the party.",
+              className: "roll",
+              aiIgnore: "true",
+              owner: "ai",
+            };
+            setMessages([...messages, loseRes.data, leavesThePartyMessage]);
+            setGameOver(1);
+          }
           // If player is trying to cheat by rolling higher
-          if (max > currentRoll) {
+          else if (max > currentRoll) {
             const cheatRes = await axios.post(apiUrl + "cheatroll", {
               name: userName,
               opponent: opponent,
@@ -174,11 +203,31 @@ function App() {
             const resRollValue = res2.data.rollValue;
             setCurrentRoll(resRollValue);
 
-            const selfReactionThreshold = 0.5;
+            const selfReactionThreshold = 1.1;
             const selfReactionRand = Math.random();
-            // Insert check for === 1 rollValue and AI loss here
+            // Insert check for === 1 rollValue and user win here
+            if (resRollValue === 1) {
+              const loseRes = await axios.post(apiUrl + "win", {
+                name: userName,
+                opponent: opponent,
+                messages: messages,
+                min: min,
+                max: max,
+                owner: "human",
+                aiIgnore: "true",
+              });
+              const leavesThePartyMessage = {
+                name: opponent,
+                text: opponent + " leaves the party.",
+                className: "roll",
+                aiIgnore: "true",
+                owner: "ai",
+              };
+              setMessages([...messages, loseRes.data, leavesThePartyMessage]);
+              setGameOver(1);
+            }
             // else if reaction triggered
-            if (selfReactionRand > selfReactionThreshold) {
+            else if (selfReactionRand > selfReactionThreshold) {
               const reactionRes = await axios.post(apiUrl + "reactroll", {
                 name: userName,
                 opponent: opponent,
@@ -201,7 +250,7 @@ function App() {
         const newMessage = {
           name: userName,
           text: e.target.value,
-          className: "member",
+          className: "leader",
           owner: "human",
         };
         const newMessages = [...messages, newMessage];
@@ -223,38 +272,62 @@ function App() {
 
   const postRoll = async (newMessages) => {};
 
+  console.log("RENDER All messages: ", messages);
+
+  const handleUserNameInputSubmit = (e) => {
+    setUserName(e.target.value);
+    console.log("User name set to ", e.target.value);
+  };
+
+  if (!userName) {
+    return (
+      <div className="content">
+        <div className="nameSelectWrapper">
+          <span>My name is </span>
+          <input
+            className="nameInput"
+            type="text"
+            onSubmit={handleUserNameInputSubmit}
+          ></input>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="content">
       <div className="chatWrapper" ref={chatWrapperRef}>
         <ChatBox messages={messages} />
-        <div
-          className="chatbar"
-          onClick={() => {
-            setIsChatInputDisplayed(true);
-          }}
-        >
-          {isChatInputDisplayed && (
-            <>
-              <img className="chatbarImage" src="chatbar.png"></img>
-              <div className="chatbarText">
-                <span>Party: </span>
-                <input
-                  className="chatbarInput"
-                  type="text"
-                  onChange={handleChatInputChange}
-                  onBlur={() => {
-                    setIsChatInputDisplayed(false);
-                  }}
-                  onKeyDown={handleChatInputKeyPress}
-                  ref={inputRef}
-                ></input>
-              </div>
-            </>
-          )}
-          {!isChatInputDisplayed && (
-            <img className="chatbarImage faded" src="chatbar.png"></img>
-          )}
-        </div>
+        {gameOver === 0 && (
+          <div
+            className="chatbar"
+            onClick={() => {
+              setIsChatInputDisplayed(true);
+            }}
+          >
+            {isChatInputDisplayed && (
+              <>
+                <img className="chatbarImage" src="chatbar.png"></img>
+                <div className="chatbarText">
+                  <span>Party: </span>
+                  <input
+                    className="chatbarInput"
+                    type="text"
+                    onChange={handleChatInputChange}
+                    onBlur={() => {
+                      setIsChatInputDisplayed(false);
+                    }}
+                    onKeyDown={handleChatInputKeyPress}
+                    ref={inputRef}
+                  ></input>
+                </div>
+              </>
+            )}
+            {!isChatInputDisplayed && (
+              <img className="chatbarImage faded" src="chatbar.png"></img>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

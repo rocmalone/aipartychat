@@ -18,14 +18,14 @@ function ChatBox({ messages }) {
   });
 
   useEffect(() => {
-    setQueue([...newQueue]);
-  }, [messages]);
-
-  useEffect(() => {
     // Scroll to the bottom of the chat box when messages are updated
     if (chatboxRef.current) {
       chatboxRef.current.scrollTop = chatboxRef.current.scrollHeight;
     }
+    setQueue([...newQueue]);
+  }, [messages]);
+
+  useEffect(() => {
     console.log("Queue @ start of effect:", queue);
     if (queue[0]) {
       if (queue[0].owner === "human" || queue[0].delay === "false") {
