@@ -22,33 +22,59 @@ function App() {
   const [input, setInput] = useState("");
   const inputRef = useRef(null);
   const chatWrapperRef = useRef(null);
-  const [isChatInputDisplayed, setIsChatInputDisplayed] = useState();
+  const [isChatInputDisplayed, setIsChatInputDisplayed] = useState(false);
 
   const [messages, setMessages] = useState([
     {
       name: name,
       className: "roll",
-      text: "[System] Type /roll to start playing death roll, or ask Bacchus how to play.",
+      text: "[System] Deathroll is a game of chance.",
       aiIgnore: "true",
       owner: "system",
+      delay: 500,
+    },
+    {
+      name: name,
+      className: "roll",
+      text: "[System] Each player rolls a die with a maximum equal to the last roll.",
+      aiIgnore: "true",
+      owner: "system",
+      delay: 1500,
+    },
+    {
+      name: name,
+      className: "roll",
+      text: "[System] The first player to roll a one loses. Type '/roll 100' to begin.",
+      aiIgnore: "true",
+      owner: "system",
+      delay: 1500,
+    },
+    {
+      name: name,
+      className: "roll",
+      text: "[System] Bacchus can teach you more, but be wary of handsome rogues.",
+      aiIgnore: "true",
+      owner: "system",
+      delay: 1500,
     },
     {
       name: name,
       className: "roll",
       text: "Bacchus joins the party.",
       aiIgnore: "true",
-      owner: "ai",
+      owner: "system",
+      delay: 1500,
     },
-    // {
-    //   name: "Bacchus",
-    //   text: "I stride through Stormwind, cloak billowing, the shadows embracing me. My past fuels my shadow magic, but my path is now one of redemption. I heal the wounded, fight the darkness. I may be a shadow priest, but I am a force for good. A drink in hand, I toast to my newfound purpose. The Light and the Shadows unite within me. I offer solace to those in pain, hope to those in despair. I am Lawrence Bacchus, the Shadow of Redemption.",
-    //   className: "leader",
-    //   human: "no",
-    // },
   ]);
 
   useEffect(() => {
     window.addEventListener("keydown", globalHandleKeyPress);
+    setTimeout(() => {
+      if (!isChatInputDisplayed) {
+        setIsChatInputDisplayed(true);
+      }
+    }, 8000);
+
     return () => {
       window.removeEventListener("keydown", globalHandleKeyPress);
     };
@@ -61,11 +87,10 @@ function App() {
   }, [isChatInputDisplayed]);
 
   const globalHandleKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && input) {
       console.log("Enter key captured", isChatInputDisplayed);
-      if (!isChatInputDisplayed) {
-        console.log("Set to true");
-        setIsChatInputDisplayed(true);
+      if (isChatInputDisplayed) {
+        setIsChatInputDisplayed(false);
       }
     } else if (e.key === "Escape") {
       setIsChatInputDisplayed(false);
@@ -76,11 +101,17 @@ function App() {
     setInput(e.target.value);
   };
 
+  const handlePlayAgain = (e) => {
+    window.location.reload();
+  };
+
   const handleChatInputKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && input) {
       // Try to leave focus
+      disableChatInput();
       inputRef.current.blur();
       chatWrapperRef.current.focus();
+      console.log("hit enter");
 
       const newText = e.target.value;
 
@@ -148,6 +179,7 @@ function App() {
               owner: "ai",
             };
             setMessages([...messages, loseRes.data, leavesThePartyMessage]);
+            disableChatInput();
             setGameOver(1);
           }
           // If player is trying to cheat by rolling higher
@@ -265,18 +297,27 @@ function App() {
 
   const postMessages = async (newMessages) => {
     const res = await axios.post(apiUrl + "chat", { messages: newMessages });
-
     setMessages([...newMessages, res.data]);
     console.log(res.data);
   };
 
-  const postRoll = async (newMessages) => {};
-
-  console.log("RENDER All messages: ", messages);
+  // console.log("RENDER All messages: ", messages);
 
   const handleUserNameInputSubmit = (e) => {
     setUserName(e.target.value);
     console.log("User name set to ", e.target.value);
+  };
+
+  const enableChatInput = () => {
+    if (!isChatInputDisplayed) {
+      setIsChatInputDisplayed(true);
+    }
+  };
+
+  const disableChatInput = () => {
+    if (isChatInputDisplayed) {
+      setIsChatInputDisplayed(false);
+    }
   };
 
   if (!userName) {
@@ -296,39 +337,54 @@ function App() {
 
   return (
     <div className="content">
-      <div className="chatWrapper" ref={chatWrapperRef}>
-        <ChatBox messages={messages} />
-        {gameOver === 0 && (
-          <div
-            className="chatbar"
-            onClick={() => {
-              setIsChatInputDisplayed(true);
-            }}
-          >
-            {isChatInputDisplayed && (
-              <>
-                <img className="chatbarImage" src="chatbar.png"></img>
-                <div className="chatbarText">
-                  <span>Party: </span>
-                  <input
-                    className="chatbarInput"
-                    type="text"
-                    onChange={handleChatInputChange}
-                    onBlur={() => {
-                      setIsChatInputDisplayed(false);
-                    }}
-                    onKeyDown={handleChatInputKeyPress}
-                    ref={inputRef}
-                  ></input>
-                </div>
-              </>
-            )}
-            {!isChatInputDisplayed && (
-              <img className="chatbarImage faded" src="chatbar.png"></img>
-            )}
-          </div>
-        )}
+      <div className="video-container">
+        <video id="bg-vid" src="inn_loop.mp4" autoPlay muted loop></video>
       </div>
+
+      <div className="chatWrapper" ref={chatWrapperRef}>
+        <div id="bg-chat"></div>
+        <ChatBox
+          messages={messages}
+          enableChatInput={enableChatInput}
+          disableChatInput={disableChatInput}
+        />
+        <div
+          className="chatbar"
+          // onClick={() => {
+          //   setIsChatInputDisplayed(true);
+          // }}
+        >
+          {isChatInputDisplayed && (
+            <>
+              <img className="chatbarImage" src="chatbar.png"></img>
+              <div className="chatbarText">
+                <span>Party: </span>
+                <input
+                  className="chatbarInput"
+                  type="text"
+                  onChange={handleChatInputChange}
+                  onBlur={() => {
+                    if (inputRef.current) {
+                      inputRef.current.focus();
+                    }
+                  }}
+                  onKeyDown={handleChatInputKeyPress}
+                  ref={inputRef}
+                  disabled={!isChatInputDisplayed}
+                ></input>
+              </div>
+            </>
+          )}
+          {!isChatInputDisplayed && (
+            <img className="chatbarImage faded" src="chatbar.png"></img>
+          )}
+        </div>
+      </div>
+      {gameOver === 1 && (
+        <button className="play-again" onClick={handlePlayAgain}>
+          Play again?
+        </button>
+      )}
     </div>
   );
 }
