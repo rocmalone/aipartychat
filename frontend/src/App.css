@@ -4,6 +4,8 @@ body {
   max-width: 100%;
   background-color: black;
   overflow: hidden;
+  font-family: Arial, sans-serif;
+  letter-spacing: -1px;
 }
 
 .content {
@@ -46,13 +48,11 @@ body {
 }
 
 .nameSelectWrapper {
-  font-family: "Arial Narrow", Arial, sans-serif;
   font-size: 16pt;
   color: white;
 }
 
 .nameInput {
-  font-family: "Arial Narrow", Arial, sans-serif;
   font-size: 16pt;
   color: black;
 }
@@ -62,7 +62,6 @@ body {
   --member-color: #aaa7ff;
   --leader-color: #76c5ff;
   --server-color: #f2ef75;
-  font-family: "Arial Narrow", Arial, sans-serif;
   font-size: 16pt;
   color: var(--member-color);
   width: 589px;
@@ -71,12 +70,14 @@ body {
 .chat {
   padding-left: 12px;
   padding-right: 4px;
-  padding-bottom: 6px;
+  padding-bottom: 0px;
 
   /* border: 1px solid red; */
   height: 300px;
   overflow-x: hidden;
   overflow-y: auto;
+
+  font-size: 19px;
 
   display: flex;
   flex-direction: column;
@@ -86,11 +87,6 @@ body {
 
 .chat::-webkit-scrollbar {
   display: none;
-}
-
-.chat div {
-  /* flex-basis: 0; */
-  /* flex-grow: 1; */
 }
 
 .chat .member {
@@ -113,6 +109,7 @@ body {
 .chatbar {
   display: inline-block;
   position: relative;
+  height: 50px;
 }
 
 .chatbarImage {
@@ -127,7 +124,9 @@ body {
   position: absolute;
   top: 15px;
   left: 19px;
-  width: 90%;
+  min-width: 555px;
+  height: auto;
+  font-size: 19px;
 }
 
 .chatbarInput {
@@ -138,9 +137,8 @@ body {
   margin: 0;
   outline: none;
 
-  width: 90%;
-  font-family: "Arial Narrow";
-  font-size: 16pt;
+  min-width: 485px;
+  font-size: 19px;
   color: var(--member-color);
 }
 

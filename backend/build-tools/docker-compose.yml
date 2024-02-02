@@ -1,0 +1,14 @@
+version: "3"
+services:
+  node-server:
+    image: node:14
+    container_name: your-node-server-container
+    working_dir: /usr/src/app
+    environment:
+      - PORT=3000
+      - OPENAI_KEY=your_openai_key_here
+    volumes:
+      - ./your-node-app-directory:/usr/src/app
+    ports:
+      - "3000:3000"
+    command: ["node", "server.js"]

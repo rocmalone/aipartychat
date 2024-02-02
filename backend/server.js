@@ -60,6 +60,10 @@ function roll(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+app.get("/api/test", async (req, res) => {
+  res.status(200).send("test successful");
+});
+
 app.post("/api/lose", async (req, res) => {
   const messages = req.body.messages;
   const name = req.body.name;
@@ -279,4 +283,5 @@ app.post("/api/chat", async (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  console.log(`API Key is ${process.env.OPENAI_API_KEY}`);
 });

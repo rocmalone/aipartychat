@@ -4,11 +4,11 @@ import axios from "axios";
 import "./App.css";
 import ChatBox from "./components/ChatBox";
 
-const apiUrl = "http://localhost:3001/api/";
+const apiUrl = import.meta.env.VITE_API_URL;
 
-// ** TODO: Make it so that pressing 'Enter' unfocuses the chat bar and lets it fade
 //    (i.e. sets isChatInputDisplayed = false)
 function App() {
+  console.log("API URL: " + apiUrl);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState("");
 
@@ -16,8 +16,6 @@ function App() {
   const [opponent, setOpponent] = useState("Bacchus");
   const [currentRoll, setCurrentRoll] = useState(100);
   const [gameOver, setGameOver] = useState(0);
-
-  const [userRoll, setUserRoll] = useState(null);
 
   const [input, setInput] = useState("");
   const inputRef = useRef(null);
@@ -63,7 +61,7 @@ function App() {
       text: "Bacchus joins the party.",
       aiIgnore: "true",
       owner: "system",
-      delay: 1500,
+      delay: 1000,
     },
   ]);
 
